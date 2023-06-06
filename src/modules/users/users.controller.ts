@@ -72,7 +72,7 @@ export class UsersController {
     @Param('id', ParseMongoObjectIdPipe) id: Types.ObjectId,
     @Body() body: UpdateUserDto,
   ): Promise<User> {
-    return;
+    return this.usersService.updateUser(id, body);
   }
 
   @Delete('/:id')
