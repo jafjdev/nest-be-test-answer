@@ -31,7 +31,7 @@ export class User {
     example: 'johnsmith@nestjs.com',
     required: false,
   })
-  @Prop()
+  @Prop({ unique: true })
   email: string;
 
   @ApiProperty({
@@ -79,3 +79,5 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ email: 1 }, { unique: true });
