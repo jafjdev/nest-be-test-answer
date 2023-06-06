@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { IAppConfig } from 'config/app.config';
@@ -7,6 +11,7 @@ import { Model, Types } from 'mongoose';
 import { User } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -69,6 +74,18 @@ export class UsersService {
       .exec();
   }
 
+  async updateUser(id: Types.ObjectId, body: UpdateUserDto) {
+    const { _id, ...rest } = body;
+    const updatedUser = await this.getModel().findByIdAndUpdate(id, rest, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return updatedUser;
+  }
   async softDelete(id: Types.ObjectId): Promise<User> {
     const softDeletedUser = await this.getModel().findByIdAndUpdate(
       id,
@@ -77,7 +94,7 @@ export class UsersService {
     );
 
     if (!softDeletedUser) {
-      throw new UnprocessableEntityException(`User with id ${id} not found`);
+      throw new NotFoundException(`User with id ${id} not found`);
     }
 
     return softDeletedUser;
