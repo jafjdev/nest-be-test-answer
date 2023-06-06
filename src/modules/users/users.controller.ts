@@ -82,7 +82,7 @@ export class UsersController {
   async deleteUser(
     @Param('id', ParseMongoObjectIdPipe) id: Types.ObjectId,
   ): Promise<User> {
-    return;
+    return this.usersService.softDelete(id);
   }
 
   @Post('/upload')

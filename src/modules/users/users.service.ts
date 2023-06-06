@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { IAppConfig } from 'config/app.config';
 import { IMongoConfig } from 'config/mongo.config';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
@@ -67,6 +67,16 @@ export class UsersService {
       .limit(limit)
       .sort({ [sortBy]: sort })
       .exec();
+  }
+
+  async softDelete(id: Types.ObjectId): Promise<User> {
+    const softDeletedUser = await this.getModel().findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
+
+    return softDeletedUser;
   }
 
   getModel(): Model<User> {
