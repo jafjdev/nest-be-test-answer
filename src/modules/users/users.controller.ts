@@ -31,6 +31,8 @@ import { UploadUsersResponseDto } from './dto/upload-users-response.dto';
 import { UsersInterceptor } from './interceptors/users.interceptor';
 import { User } from './schema/user.schema';
 import { UsersService } from './users.service';
+import { ApiOkResponsePaginated } from '../../decorators/api-ok-response-paginated.decorator';
+import { PaginatedResponseDto } from './dto/paginated-response.dto';
 
 @ApiTags('Users API')
 @Controller('users')
@@ -42,14 +44,24 @@ export class UsersController {
   @ApiOperation({ summary: `Create a new user` })
   @ApiOkResponse({ type: User })
   async postUsers(@Body() body: CreateUserDto): Promise<User> {
-    return;
+    return this.usersService.createUser(body);
   }
 
   @Get('/')
   @ApiOperation({ summary: `Return a list of users` })
-  @ApiOkResponse({ type: [User] })
-  async getUsers(@Query() query: QueryUserDto): Promise<User[]> {
-    return await this.usersService.getModel().find();
+  @ApiOkResponse({ type: ApiOkResponsePaginated(User) })
+  async getUsers(
+    @Query() query: QueryUserDto,
+  ): Promise<PaginatedResponseDto<User>> {
+    const users = await this.usersService.getUsers(query);
+
+    return new PaginatedResponseDto<User>({
+      data: users,
+      limit: query.limit,
+      page: query.page,
+      sort: query.sort,
+      sortBy: query.sortBy,
+    });
   }
 
   @Patch('/:id')
