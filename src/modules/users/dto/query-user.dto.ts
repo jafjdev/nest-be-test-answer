@@ -10,7 +10,7 @@ export class QueryUserDto extends PartialType(User) {
     description: `Number of users to return`,
     required: false,
   })
-  limit: number = 20;
+  limit = 20;
 
   @ApiProperty({
     default: 1,
@@ -21,7 +21,7 @@ export class QueryUserDto extends PartialType(User) {
   @IsOptional()
   @Min(1)
   @Type(() => Number)
-  page: number = 1;
+  page = 1;
 
   @ApiProperty({
     default: PaginatedResponseSortEnum.DESC,
@@ -39,7 +39,7 @@ export class QueryUserDto extends PartialType(User) {
     description: `User field to sort by`,
     required: false,
   })
-  sortBy: string = 'createdAt';
+  sortBy = 'createdAt';
 
   constructor(args?: Partial<QueryUserDto>) {
     super();
