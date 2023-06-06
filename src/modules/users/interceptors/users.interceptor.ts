@@ -35,7 +35,7 @@ export class UsersInterceptor implements NestInterceptor {
         catchError(async (err) => {
           // log error
           this.logger.error(`(${requestId}) ${JSON.stringify(err)}`);
-          return err;
+          throw err;
         }),
       );
   }
