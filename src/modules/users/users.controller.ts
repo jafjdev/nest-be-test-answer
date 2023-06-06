@@ -123,17 +123,8 @@ export class UsersController {
         'Uploaded file is not a CSV file.',
       );
     }
-
-    const users = await CsvParser.parse(file.path);
-
-    /**
-     * @todo
-     * Insert users into database
-     */
-
-    return new UploadUsersResponseDto({
-      failedCount: 0,
-      successCount: 0,
-    });
+    const usersCSV = await CsvParser.parse(file.path);
+    const count = await this.usersService.uploadUsers(usersCSV);
+    return new UploadUsersResponseDto(count);
   }
 }

@@ -103,4 +103,33 @@ export class UsersService {
   getModel(): Model<User> {
     return this.mongooseModel;
   }
+
+  async uploadUsers(usersCSV) {
+    const count = {
+      failedCount: 0,
+      successCount: 0,
+    };
+    const userList: User[] = usersCSV.map(
+      (user) =>
+        new User({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          status: user.status,
+          marketingSource: user.provider,
+          birthDate: user.birth_date,
+        }),
+    );
+    const userAmount = userList.length;
+    try {
+      count.successCount = userAmount;
+      await this.getModel().insertMany(userList);
+      return count;
+    } catch (err) {
+      count.successCount = err.insertedCount;
+      count.failedCount = userAmount - err.insertedCount;
+      return count;
+    }
+  }
 }
