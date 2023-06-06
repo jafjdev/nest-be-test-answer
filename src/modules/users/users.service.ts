@@ -76,6 +76,10 @@ export class UsersService {
       { new: true },
     );
 
+    if (!softDeletedUser) {
+      throw new UnprocessableEntityException(`User with id ${id} not found`);
+    }
+
     return softDeletedUser;
   }
 
