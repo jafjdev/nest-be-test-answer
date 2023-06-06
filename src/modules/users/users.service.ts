@@ -34,7 +34,10 @@ export class UsersService {
   }
 
   private buildQuery(queryUserDto: QueryUserDto) {
-    const query = this.getModel().find();
+    const query = this.getModel().find({
+      $nor: [{ isDeleted: true }],
+    });
+
     const queryFields = [
       'firstName',
       'lastName',
