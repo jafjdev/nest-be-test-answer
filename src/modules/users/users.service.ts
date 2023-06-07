@@ -112,7 +112,7 @@ export class UsersService {
     const userList: User[] = usersCSV.map(
       (user) =>
         new User({
-          firstName: user.firstName,
+          firstName: user.firstname,
           lastName: user.lastName,
           email: user.email,
           phone: user.phone,
