@@ -1,3 +1,5 @@
+const SERVER_URL = 'http://localhost:9000/users';
+
 describe(`Users API Integration Tests`, () => {
   let users;
   it('should upload a CSV file', () => {
@@ -8,7 +10,7 @@ describe(`Users API Integration Tests`, () => {
 
       cy.request({
         method: 'POST',
-        url: 'http://localhost:9000/users/upload',
+        url: `${SERVER_URL}/upload`,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -19,18 +21,16 @@ describe(`Users API Integration Tests`, () => {
       });
     });
   });
-  it(`GET /users`, () => {
-    cy.request({ url: 'http://localhost:9000/users', method: 'get' }).then(
-      (res) => {
-        expect(res.status).eq(200);
-        expect(res.body.data.length).to.be.greaterThan(0);
-        users = res.body.data;
-      },
-    );
+  it(`should get users`, () => {
+    cy.request({ url: `${SERVER_URL}`, method: 'get' }).then((res) => {
+      expect(res.status).eq(200);
+      expect(res.body.data.length).to.be.greaterThan(0);
+      users = res.body.data;
+    });
   });
-  it(`GET /users?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt`, () => {
+  it(`should get users with query params /users?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt`, () => {
     cy.request({
-      url: 'http://localhost:9000/users?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt',
+      url: `${SERVER_URL}?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt`,
       method: 'get',
     }).then((res) => {
       expect(res.status).eq(200);
@@ -40,6 +40,32 @@ describe(`Users API Integration Tests`, () => {
       expect(res.body.sortBy).to.eq('createdAt');
       expect(res.body.data.length).to.be.greaterThan(0);
       expect(res.body.data.every((user) => user.firstName.match(/john/i)));
+    });
+  });
+  it('should update a user', () => {
+    const updatedUser = {
+      birthDate: '2023-06-05T13:37:28.132Z',
+      firstName: 'Testing',
+      lastName: 'Name',
+    };
+    const user = users[0];
+    cy.request('PATCH', `${SERVER_URL}/${user._id}`, updatedUser).then(
+      (response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.firstName).to.eq(updatedUser.firstName);
+        expect(response.body.lastName).to.eq(updatedUser.lastName);
+      },
+    );
+  });
+  it(`should delete user`, () => {
+    const userDelete = users[0];
+    cy.request({
+      url: `${SERVER_URL}/${userDelete._id}`,
+      method: 'DELETE',
+    }).then((res) => {
+      expect(res.status).eq(200);
+      expect(res.body.isDeleted).to.be.true;
+      expect(res.body._id).to.eq(userDelete._id);
     });
   });
 });
