@@ -1,9 +1,30 @@
 describe(`Users API Integration Tests`, () => {
+  let users;
+  it('should upload a CSV file', () => {
+    cy.fixture('users.csv', 'binary').then((csvFile) => {
+      const blob = new Blob([csvFile], { type: 'text/csv' });
+      const formData = new FormData();
+      formData.append('file', blob, 'users.csv');
+
+      cy.request({
+        method: 'POST',
+        url: 'http://localhost:9000/users/upload',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      }).then((response) => {
+        expect(response.status).to.equal(201);
+        expect(response.status);
+      });
+    });
+  });
   it(`GET /users`, () => {
     cy.request({ url: 'http://localhost:9000/users', method: 'get' }).then(
       (res) => {
         expect(res.status).eq(200);
         expect(res.body.data.length).to.be.greaterThan(0);
+        users = res.body.data;
       },
     );
   });
