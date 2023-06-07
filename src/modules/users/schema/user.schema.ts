@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
+import { IsEmail, IsPhoneNumber } from 'class-validator';
 
 export type UserDocument = User & Document;
 
@@ -32,6 +33,7 @@ export class User {
     required: false,
   })
   @Prop({ unique: true })
+  @IsEmail()
   email: string;
 
   @ApiProperty({
@@ -59,6 +61,7 @@ export class User {
 
   @ApiProperty({ required: false })
   @Prop({ required: true, index: true })
+  @IsPhoneNumber('US')
   phone: string;
 
   @ApiProperty({
