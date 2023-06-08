@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiConsumes,
   ApiOkResponse,
@@ -80,6 +81,27 @@ export class UsersController {
   @ApiOperation({ summary: `Update a single user` })
   @ApiParam({ name: 'id', type: String })
   @ApiOkResponse({ type: User })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Bad Request || Invalid ObjectId',
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'NotFoundException',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'User with id {id} not found',
+        error: 'User Not Found',
+      },
+    },
+  })
   async patchUser(
     @Param('id', ParseMongoObjectIdPipe) id: Types.ObjectId,
     @Body() body: UpdateUserDto,
@@ -91,6 +113,27 @@ export class UsersController {
   @ApiOperation({ summary: `Soft delete a single user` })
   @ApiParam({ name: 'id', type: String })
   @ApiOkResponse({ type: User })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Bad Request || Invalid ObjectId',
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'NotFoundException',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'User with id {id} not found',
+        error: 'User Not Found',
+      },
+    },
+  })
   async deleteUser(
     @Param('id', ParseMongoObjectIdPipe) id: Types.ObjectId,
   ): Promise<User> {
