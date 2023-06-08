@@ -18,6 +18,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
@@ -43,6 +44,17 @@ export class UsersController {
   @Post('/')
   @ApiOperation({ summary: `Create a new user` })
   @ApiOkResponse({ type: User })
+  @ApiResponse({
+    status: 422,
+    description: 'UnprocessableEntityException',
+    schema: {
+      example: {
+        statusCode: 422,
+        message: 'User with email {email} already exists',
+        error: 'Unprocessable Entity',
+      },
+    },
+  })
   async postUsers(@Body() body: CreateUserDto): Promise<User> {
     return this.usersService.createUser(body);
   }
