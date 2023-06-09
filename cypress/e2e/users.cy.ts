@@ -1,10 +1,13 @@
+import { randomString } from '../../src/utils/helpers';
+
 describe(`Users API Integration Tests`, () => {
   let users;
-  const randomEmail = (Math.random() + 1).toString(36).substring(7);
+  const randomEmail = `${randomString()}@gmail.com`;
+
   it('should create user', function () {
     const createdUser = {
       birthDate: '2023-06-05T13:37:28.132Z',
-      email: `${randomEmail}@gmail.com`,
+      email: randomEmail,
       firstName: 'Jose',
       lastName: 'Cedeno',
       marketingSource: 'string',
