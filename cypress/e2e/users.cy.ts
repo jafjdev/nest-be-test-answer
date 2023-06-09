@@ -1,7 +1,22 @@
-const SERVER_URL = 'http://localhost:9000/users';
-
 describe(`Users API Integration Tests`, () => {
   let users;
+  const randomEmail = (Math.random() + 1).toString(36).substring(7);
+  it('should create user', function () {
+    const createdUser = {
+      birthDate: '2023-06-05T13:37:28.132Z',
+      email: `${randomEmail}@gmail.com`,
+      firstName: 'Jose',
+      lastName: 'Cedeno',
+      marketingSource: 'string',
+      phone: '4149434721',
+      status: 'DQL',
+    };
+    cy.request('POST', '/', createdUser).then((response) => {
+      expect(response.status).to.eq(201);
+      expect(response.body.firstName).to.eq(createdUser.firstName);
+      expect(response.body.lastName).to.eq(createdUser.lastName);
+    });
+  });
   it('should upload a CSV file', () => {
     cy.fixture('users.csv', 'binary').then((csvFile) => {
       const blob = new Blob([csvFile], { type: 'text/csv' });
@@ -10,7 +25,7 @@ describe(`Users API Integration Tests`, () => {
 
       cy.request({
         method: 'POST',
-        url: `${SERVER_URL}/upload`,
+        url: '/upload',
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -22,7 +37,7 @@ describe(`Users API Integration Tests`, () => {
     });
   });
   it(`should get users`, () => {
-    cy.request({ url: `${SERVER_URL}`, method: 'get' }).then((res) => {
+    cy.request({ url: '/', method: 'get' }).then((res) => {
       expect(res.status).eq(200);
       expect(res.body.data.length).to.be.greaterThan(0);
       users = res.body.data;
@@ -30,7 +45,7 @@ describe(`Users API Integration Tests`, () => {
   });
   it(`should get users with query params /users?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt`, () => {
     cy.request({
-      url: `${SERVER_URL}?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt`,
+      url: '?firstName=John&limit=20&page=1&sort=-1&sortBy=createdAt',
       method: 'get',
     }).then((res) => {
       expect(res.status).eq(200);
@@ -49,23 +64,32 @@ describe(`Users API Integration Tests`, () => {
       lastName: 'Name',
     };
     const user = users[0];
-    cy.request('PATCH', `${SERVER_URL}/${user._id}`, updatedUser).then(
-      (response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.firstName).to.eq(updatedUser.firstName);
-        expect(response.body.lastName).to.eq(updatedUser.lastName);
-      },
-    );
+    cy.request('PATCH', `/${user._id}`, updatedUser).then((response) => {
+      expect(response.status).to.eq(200);
+      expect(response.body.firstName).to.eq(updatedUser.firstName);
+      expect(response.body.lastName).to.eq(updatedUser.lastName);
+    });
   });
   it(`should delete user`, () => {
     const userDelete = users[0];
     cy.request({
-      url: `${SERVER_URL}/${userDelete._id}`,
+      url: `/${userDelete._id}`,
       method: 'DELETE',
     }).then((res) => {
       expect(res.status).eq(200);
       expect(res.body.isDeleted).to.be.true;
       expect(res.body._id).to.eq(userDelete._id);
+      expect(res.body.email).to.eq(userDelete.email);
+    });
+  });
+  it(`should not return unexisting user user`, () => {
+    const userDelete = users[0];
+    cy.request({
+      url: `?email=${userDelete.email}`,
+      method: 'GET',
+    }).then((res) => {
+      expect(res.status).eq(200);
+      expect(res.body.data).to.be.empty;
     });
   });
 });
